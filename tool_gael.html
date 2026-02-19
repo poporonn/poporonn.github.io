@@ -396,10 +396,22 @@ nav button.active {
 }
 
 @media (max-width: 700px) {
+  header { flex-direction: column; gap: 0.5rem; padding: 0.8rem 1rem; text-align: center; }
+  header > div[style*="text-align:right"] { text-align: center; }
+  header h1 { font-size: 1.2rem; }
   .form-grid, .results-grid, .patient-info, .patient-info-3 { grid-template-columns: 1fr; }
+  .three-col { grid-template-columns: 1fr !important; }
   .form-group.full, .result-item.full { grid-column: 1; }
-  nav button { padding: 0.6rem 0.8rem; font-size: 0.8rem; }
-  .module { padding: 1rem; }
+  nav { padding: 0 0.3rem; }
+  nav button { padding: 0.5rem 0.6rem; font-size: 0.72rem; }
+  .module { padding: 0.8rem; }
+  .card { padding: 1rem; }
+  .btn-row { flex-wrap: wrap; }
+  .btn { padding: 0.5rem 1rem; font-size: 0.82rem; }
+  .norms-table { font-size: 0.75rem; }
+  .formula-box { padding: 0.3rem 0.5rem !important; }
+  .formula-main { font-size: 0.8rem !important; }
+  .formula-legend { font-size: 0.62rem !important; }
   /* Stack the 2-column thyroid layout on small screens */
   #mod-thyroide > div[style*="display:flex"] { flex-direction: column !important; }
   #mod-thyroide > div[style*="display:flex"] > .card { flex: 1 1 auto !important; }
