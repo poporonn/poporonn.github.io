@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   ╔══════════════════════════════════════════════════════════════════╗
-  ║  TOOL GAËL — Outil d'analyse pour la Médecine Nucléaire        ║
+  ║  TOOL GAËL — Simple outil de calcul pour la Médecine Nucléaire        ║
   ║                                                                 ║
   ║  Copyright © Swiss Nuclear Doctors — Tous droits réservés       ║
   ║  Développé par Gaël Amzalag                                     ║
@@ -408,11 +408,13 @@ nav button.active {
   body { overflow-x: hidden; }
   .module { padding: 0.3rem; max-width: 100%; overflow-x: hidden; }
   .card { padding: 0.5rem; margin-bottom: 0.5rem; margin-left: 0; margin-right: 0; border-radius: 6px; }
-  .form-grid, .results-grid, .patient-info, .patient-info-3 { grid-template-columns: 1fr; gap: 0.5rem; max-width: 100%; }
-  .three-col { grid-template-columns: 1fr !important; }
+  .form-grid, .results-grid, .patient-info, .patient-info-3 { grid-template-columns: 1fr; gap: 0.4rem; max-width: 100%; }
+  .form-grid.three-col { grid-template-columns: auto 1fr 1fr !important; gap: 0.3rem 0.4rem; }
+  .results-grid.three-col { grid-template-columns: 1fr !important; }
   .form-group.full, .result-item.full { grid-column: 1; }
   .form-group { max-width: 100%; }
-  .form-group input, .form-group select { font-size: 0.85rem; padding: 0.4rem 0.5rem; width: 100%; max-width: 100%; }
+  .form-group label { font-size: 0.72rem; }
+  .form-group input, .form-group select { font-size: 0.8rem; padding: 0.3rem 0.4rem; width: 100%; max-width: 100%; }
   input[type="date"] { -webkit-appearance: none; appearance: none; }
   nav { padding: 0 0.3rem; }
   nav button { padding: 0.5rem 0.6rem; font-size: 0.72rem; }
@@ -468,7 +470,7 @@ nav button.active {
     </svg>
     <div>
       <h1>TOOL GAËL</h1>
-      <div class="subtitle">Outil d'analyse pour la Médecine Nucléaire</div>
+      <div class="subtitle">Simple outil de calcul pour la Médecine Nucléaire</div>
     </div>
   </div>
   <div style="text-align:right">
@@ -503,21 +505,21 @@ nav button.active {
     <h3>Données d'acquisition (counts)</h3>
     <div class="form-grid">
       <div></div>
-      <div style="display:flex; gap:1.5rem; font-weight:600; font-size:0.85rem; color:var(--primary); padding-bottom:0.2rem;">
-        <span style="flex:1; text-align:center">PA (postérieur)</span>
-        <span style="flex:1; text-align:center">AP (antérieur)</span>
+      <div style="display:flex; gap:0.5rem; font-weight:600; font-size:0.85rem; color:var(--primary); padding-bottom:0.2rem;">
+        <span style="flex:1; text-align:center">ROI PA (postérieur)</span>
+        <span style="flex:1; text-align:center">ROI AP (antérieur)</span>
       </div>
       <div class="form-group">
         <label>Rein Gauche</label>
       </div>
-      <div style="display:flex; gap:0.8rem;">
+      <div style="display:flex; gap:0.4rem;">
         <div class="form-group" style="flex:1"><input type="number" id="dmsa-rg-pa" oninput="calcDMSA()"></div>
         <div class="form-group" style="flex:1"><input type="number" id="dmsa-rg-ap" oninput="calcDMSA()"></div>
       </div>
       <div class="form-group">
         <label>Rein Droit</label>
       </div>
-      <div style="display:flex; gap:0.8rem;">
+      <div style="display:flex; gap:0.4rem;">
         <div class="form-group" style="flex:1"><input type="number" id="dmsa-rd-pa" oninput="calcDMSA()"></div>
         <div class="form-group" style="flex:1"><input type="number" id="dmsa-rd-ap" oninput="calcDMSA()"></div>
       </div>
