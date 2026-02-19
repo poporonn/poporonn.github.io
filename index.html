@@ -410,6 +410,7 @@ nav button.active {
   .card { padding: 0.5rem; margin-bottom: 0.5rem; margin-left: 0; margin-right: 0; border-radius: 6px; }
   .form-grid, .results-grid, .patient-info, .patient-info-3 { grid-template-columns: 1fr; gap: 0.4rem; max-width: 100%; }
   .form-grid.three-col { grid-template-columns: auto 1fr 1fr !important; gap: 0.3rem 0.4rem; }
+  .form-grid.three-col .form-group label { white-space: nowrap; font-size: 0.68rem; }
   .results-grid.three-col { grid-template-columns: 1fr !important; }
   .form-group.full, .result-item.full { grid-column: 1; }
   .form-group { max-width: 100%; }
@@ -565,18 +566,18 @@ nav button.active {
     <h3>Données d'acquisition (counts/sec)</h3>
     <div class="form-grid three-col">
       <div></div>
-      <div style="font-weight:600; font-size:0.85rem; color:var(--primary); text-align:center">Rein Droit</div>
-      <div style="font-weight:600; font-size:0.85rem; color:var(--primary); text-align:center">Rein Gauche</div>
+      <div style="font-weight:600; font-size:0.85rem; color:var(--primary); text-align:center; white-space:nowrap">R. Droit</div>
+      <div style="font-weight:600; font-size:0.85rem; color:var(--primary); text-align:center; white-space:nowrap">R. Gauche</div>
 
-      <div class="form-group"><label>Counts/sec au maximum</label></div>
+      <div class="form-group"><label>Cts/sec max</label></div>
       <div class="form-group"><input type="number" id="mag3-rd-max" oninput="calcMAG3()"></div>
       <div class="form-group"><input type="number" id="mag3-rg-max" oninput="calcMAG3()"></div>
 
-      <div class="form-group"><label>Counts/sec à 20 min</label></div>
+      <div class="form-group"><label>Cts/sec 20 min</label></div>
       <div class="form-group"><input type="number" id="mag3-rd-20" oninput="calcMAG3()"></div>
       <div class="form-group"><input type="number" id="mag3-rg-20" oninput="calcMAG3()"></div>
 
-      <div class="form-group"><label>Counts/sec en fin d'examen</label></div>
+      <div class="form-group"><label>Cts/sec fin exam.</label></div>
       <div class="form-group"><input type="number" id="mag3-rd-end" oninput="calcMAG3()"></div>
       <div class="form-group"><input type="number" id="mag3-rg-end" oninput="calcMAG3()"></div>
     </div>
