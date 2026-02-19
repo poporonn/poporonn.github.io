@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<!--
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  TOOL GAËL — Outil d'analyse pour la Médecine Nucléaire        ║
+  ║                                                                 ║
+  ║  Copyright © Swiss Nuclear Doctors — Tous droits réservés       ║
+  ║  Développé par Gaël Amzalag                                     ║
+  ║                                                                 ║
+  ║  Ce logiciel est protégé par le droit d'auteur. Toute           ║
+  ║  reproduction, distribution, modification ou utilisation         ║
+  ║  non autorisée de tout ou partie de ce code est strictement     ║
+  ║  interdite sans l'accord écrit préalable de l'auteur.           ║
+  ║                                                                 ║
+  ║  This software is protected by copyright law. Any unauthorized  ║
+  ║  reproduction, distribution, modification or use of all or      ║
+  ║  part of this code is strictly prohibited without prior         ║
+  ║  written consent of the author.                                 ║
+  ╚══════════════════════════════════════════════════════════════════╝
+-->
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOOL GAËL - Médecine Nucléaire</title>
+<style>
+:root {
+  --primary: #1a5276;
+  --primary-light: #2980b9;
+  --accent: #e74c3c;
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --text: #2c3e50;
+  --text-light: #7f8c8d;
+  --border: #dce1e8;
+  --input-bg: #fff8f0;
+  --result-bg: #eaf7ea;
+  --normal: #27ae60;
+  --warning: #e67e22;
+  --danger: #e74c3c;
+  --auto-bg: #e8f0fe;
+  --auto-border: #4a90d9;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  padding: 1.2rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+header h1 { font-size: 1.5rem; font-weight: 600; }
+header .subtitle { font-size: 0.85rem; opacity: 0.85; }
+header .version { font-size: 0.75rem; opacity: 0.6; }
+
+nav {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 0 1rem;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+nav button {
+  padding: 0.8rem 1.2rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+nav button:hover { color: var(--primary); background: #f0f4f8; }
+nav button.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+
+.module { display: none; padding: 1.5rem 2rem; max-width: 1024px; margin: 0 auto; }
+.module.active { display: block; }
+
+.module h2 {
+  font-size: 1.3rem;
+  color: var(--primary);
+  margin-bottom: 0.3rem;
+}
+
+.module .description {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 8px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.card h3 {
+  font-size: 1rem;
+  color: var(--primary);
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem 1.5rem;
+}
+
+.form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+.form-group.full { grid-column: 1 / -1; }
+
+.form-group label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.form-group label .unit {
+  font-weight: 400;
+  color: var(--text-light);
+}
+
+.form-group input, .form-group select {
+  padding: 0.5rem 0.7rem;
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  font-size: 0.95rem;
+  background: var(--input-bg);
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus, .form-group select:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(41,128,185,0.1);
+}
+
+.form-group input[readonly] {
+  background: #f0f0f0;
+  color: var(--text-light);
+}
+
+/* Auto-populated field style */
+.form-group input.auto-filled {
+  background: var(--auto-bg);
+  border-color: var(--auto-border);
+  font-weight: 600;
+}
+
+.auto-tag {
+  font-size: 0.65rem;
+  color: var(--auto-border);
+  font-weight: 400;
+  font-style: italic;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem 1.5rem;
+}
+
+.result-item {
+  background: var(--result-bg);
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+  border-left: 4px solid var(--normal);
+}
+
+.result-item.full { grid-column: 1 / -1; }
+
+.result-item .label {
+  font-size: 0.78rem;
+  color: var(--text-light);
+  margin-bottom: 0.2rem;
+}
+
+.result-item .value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.result-item .norm {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  margin-top: 0.2rem;
+}
+
+.result-item.warning { border-left-color: var(--warning); }
+.result-item.warning .value { color: var(--warning); }
+.result-item.danger { border-left-color: var(--danger); }
+.result-item.danger .value { color: var(--danger); }
+
+.btn {
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+.btn-primary:hover { background: var(--primary-light); }
+
+.btn-secondary {
+  background: #ecf0f1;
+  color: var(--text);
+}
+.btn-secondary:hover { background: #dce1e8; }
+
+.btn-row {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.patient-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.patient-info-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.norms-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.norms-table th, .norms-table td {
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.norms-table th {
+  background: #f0f4f8;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.norms-table td:last-child { text-align: center; }
+
+.three-col { grid-template-columns: 1fr 1fr 1fr; }
+
+.separator {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1rem 0;
+}
+
+/* Grossesse contra-indication overlay */
+.thy-disabled {
+  opacity: 0.35;
+  pointer-events: none;
+  position: relative;
+}
+
+.thy-disabled::after {
+  content: "CONTRE-INDICATION — GROSSESSE";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--danger);
+  background: rgba(255,255,255,0.85);
+  padding: 0.5rem 1.5rem;
+  border: 2px solid var(--danger);
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+/* OFSP status colors */
+.ofsp-ambulatoire { border-left-color: var(--normal); color: var(--normal); }
+.ofsp-derogation { border-left-color: var(--warning); color: var(--warning); }
+.ofsp-hospitalisation { border-left-color: var(--danger); color: var(--danger); }
+
+/* Marinelli formula box */
+.formula-box {
+  background: #f8f9fb;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.formula-box .formula-title {
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
+  font-size: 0.88rem;
+}
+
+.formula-box .formula-main {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  margin: 0.5rem 0;
+  padding: 0.4rem;
+  background: white;
+  border-radius: 4px;
+}
+
+.formula-box .formula-legend {
+  color: var(--text-light);
+  font-size: 0.78rem;
+}
+
+.formula-box .formula-legend span {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* No-print utility */
+.no-print { }
+
+/* Print styles - compact 1 page */
+@media print {
+  @page { margin: 8mm; size: A4; }
+  body { font-size: 9pt; background: white; }
+  nav { display: none !important; }
+  .no-print { display: none !important; }
+  header { padding: 0.3rem 0.8rem; }
+  header h1 { font-size: 1.1rem; }
+  .module { display: none !important; padding: 0.5rem 0.8rem; }
+  .module.active { display: block !important; }
+  .btn-row { display: none !important; }
+  .card { padding: 0.5rem 0.7rem; margin-bottom: 0.4rem; box-shadow: none; border: 1px solid #ccc; }
+  .card h3 { font-size: 0.85rem; margin-bottom: 0.3rem; padding-bottom: 0.2rem; }
+  .form-grid, .results-grid { gap: 0.3rem 0.8rem; }
+  .form-group label { font-size: 0.72rem; }
+  .form-group input, .form-group select { font-size: 0.8rem; padding: 0.2rem 0.4rem; border: 1px solid #999; }
+  .result-item { padding: 0.3rem 0.5rem; }
+  .result-item .value { font-size: 1rem; }
+  .result-item .label { font-size: 0.7rem; }
+  .result-item .norm { font-size: 0.65rem; }
+  .norms-table { font-size: 0.72rem; }
+  .norms-table th, .norms-table td { padding: 0.15rem 0.4rem; }
+  .separator { margin: 0.4rem 0; }
+  .formula-box { padding: 0.4rem 0.6rem; font-size: 0.72rem; }
+  .formula-box .formula-main { font-size: 0.88rem; margin: 0.2rem 0; padding: 0.2rem; }
+  .formula-box .formula-legend { font-size: 0.68rem; }
+  .patient-info, .patient-info-3 { gap: 0.3rem; }
+  .module h2 { font-size: 1rem; margin-bottom: 0.1rem; }
+  .module .description { font-size: 0.75rem; margin-bottom: 0.5rem; }
+  .three-col { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+@media (max-width: 700px) {
+  .form-grid, .results-grid, .patient-info, .patient-info-3 { grid-template-columns: 1fr; }
+  .form-group.full, .result-item.full { grid-column: 1; }
+  nav button { padding: 0.6rem 0.8rem; font-size: 0.8rem; }
+  .module { padding: 1rem; }
+  /* Stack the 2-column thyroid layout on small screens */
+  #mod-thyroide > div[style*="display:flex"] { flex-direction: column !important; }
+  #mod-thyroide > div[style*="display:flex"] > .card { flex: 1 1 auto !important; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex; align-items:center; gap:0.8rem;">
+    <svg width="36" height="36" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" style="border-radius:4px; flex-shrink:0;">
+      <rect width="600" height="600" fill="#E60000"/>
+      <g transform="translate(300 300)">
+        <g stroke="white" stroke-width="12" fill="none">
+          <ellipse rx="282" ry="150"/>
+          <ellipse rx="282" ry="150" transform="rotate(60)"/>
+          <ellipse rx="282" ry="150" transform="rotate(120)"/>
+        </g>
+        <g>
+          <rect x="-45" y="-125" width="90" height="250" fill="white"/>
+          <rect x="-125" y="-45" width="250" height="90" fill="white"/>
+          <animateTransform attributeName="transform" type="scale" values="1;1.08;1" dur="1.0s" repeatCount="indefinite"/>
+        </g>
+        <defs><circle id="e" r="12" fill="white"/></defs>
+        <g>
+          <use href="#e"><animateMotion dur="1.5s" begin="0s" repeatCount="indefinite" path="M282 0 A282 150 0 1 1 -282 0 A282 150 0 1 1 282 0"/></use>
+          <use href="#e"><animateMotion dur="1.9s" begin="0.5s" repeatCount="indefinite" path="M282 0 A282 150 0 1 0 -282 0 A282 150 0 1 0 282 0"/></use>
+          <use href="#e"><animateMotion dur="1.7s" begin="0.8s" repeatCount="indefinite" path="M282 0 A282 150 0 1 1 -282 0 A282 150 0 1 1 282 0"/></use>
+        </g>
+        <g transform="rotate(60)">
+          <use href="#e"><animateMotion dur="1.6s" begin="0.3s" repeatCount="indefinite" path="M282 0 A282 150 0 1 0 -282 0 A282 150 0 1 0 282 0"/></use>
+          <use href="#e"><animateMotion dur="1.4s" begin="1.1s" repeatCount="indefinite" path="M282 0 A282 150 0 1 1 -282 0 A282 150 0 1 1 282 0"/></use>
+          <use href="#e"><animateMotion dur="2.0s" begin="0.6s" repeatCount="indefinite" path="M282 0 A282 150 0 1 0 -282 0 A282 150 0 1 0 282 0"/></use>
+        </g>
+        <g transform="rotate(120)">
+          <use href="#e"><animateMotion dur="1.8s" begin="0.4s" repeatCount="indefinite" path="M282 0 A282 150 0 1 1 -282 0 A282 150 0 1 1 282 0"/></use>
+          <use href="#e"><animateMotion dur="1.3s" begin="0.9s" repeatCount="indefinite" path="M282 0 A282 150 0 1 0 -282 0 A282 150 0 1 0 282 0"/></use>
+          <use href="#e"><animateMotion dur="1.5s" begin="0.2s" repeatCount="indefinite" path="M282 0 A282 150 0 1 1 -282 0 A282 150 0 1 1 282 0"/></use>
+        </g>
+      </g>
+    </svg>
+    <div>
+      <h1>TOOL GAËL</h1>
+      <div class="subtitle">Outil d'analyse pour la Médecine Nucléaire</div>
+    </div>
+  </div>
+  <div style="text-align:right">
+    <div class="version">Développé par Gaël Amzalag</div>
+    <div class="version">© Swiss Nuclear Doctors</div>
+  </div>
+</header>
+
+<nav id="nav">
+  <button class="active" onclick="showModule('thyroide')">Thyroïde I-131</button>
+  <button onclick="showModule('dmsa')">DMSA</button>
+  <button onclick="showModule('mag3')">MAG3</button>
+  <button onclick="showModule('datscan')">DaTSCAN</button>
+  <button onclick="showModule('shunt_simple')">Shunt Cérébral</button>
+  <button onclick="showModule('shunt_sirt')">Shunt Pulmonaire</button>
+</nav>
+
+<!-- ==================== DMSA ==================== -->
+<div id="mod-dmsa" class="module">
+  <h2>Scintigraphie Rénale Corticale au DMSA</h2>
+  <p class="description">Fonctions rénales relatives par moyenne géométrique</p>
+
+  <div class="card">
+    <h3>Informations Patient</h3>
+    <div class="patient-info">
+      <div class="form-group"><label>ID PATIENT (NIP)</label><input type="text" id="dmsa-ipp"></div>
+      <div class="form-group"><label>Date de l'examen</label><input type="date" id="dmsa-date"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Données d'acquisition (counts)</h3>
+    <div class="form-grid">
+      <div></div>
+      <div style="display:flex; gap:1.5rem; font-weight:600; font-size:0.85rem; color:var(--primary); padding-bottom:0.2rem;">
+        <span style="flex:1; text-align:center">PA (postérieur)</span>
+        <span style="flex:1; text-align:center">AP (antérieur)</span>
+      </div>
+      <div class="form-group">
+        <label>Rein Gauche</label>
+      </div>
+      <div style="display:flex; gap:0.8rem;">
+        <div class="form-group" style="flex:1"><input type="number" id="dmsa-rg-pa" oninput="calcDMSA()"></div>
+        <div class="form-group" style="flex:1"><input type="number" id="dmsa-rg-ap" oninput="calcDMSA()"></div>
+      </div>
+      <div class="form-group">
+        <label>Rein Droit</label>
+      </div>
+      <div style="display:flex; gap:0.8rem;">
+        <div class="form-group" style="flex:1"><input type="number" id="dmsa-rd-pa" oninput="calcDMSA()"></div>
+        <div class="form-group" style="flex:1"><input type="number" id="dmsa-rd-ap" oninput="calcDMSA()"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Résultats</h3>
+    <div class="results-grid">
+      <div class="result-item" id="dmsa-res-rg">
+        <div class="label">Rein Gauche</div>
+        <div class="value" id="dmsa-val-rg">-</div>
+        <div class="norm">Norme : 45% - 55%</div>
+      </div>
+      <div class="result-item" id="dmsa-res-rd">
+        <div class="label">Rein Droit</div>
+        <div class="value" id="dmsa-val-rd">-</div>
+        <div class="norm">Norme : 45% - 55%</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="calcDMSA()">Calculer</button>
+      <button class="btn btn-secondary" onclick="resetModule('dmsa')">Réinitialiser</button>
+      <button class="btn btn-secondary" onclick="window.print()">Imprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MAG3 ==================== -->
+<div id="mod-mag3" class="module">
+  <h2>Scintigraphie Rénale Dynamique au MAG3</h2>
+  <p class="description">Indices d'élimination rénaux aux différents temps de l'examen dynamique</p>
+
+  <div class="card">
+    <h3>Informations Patient</h3>
+    <div class="patient-info">
+      <div class="form-group"><label>ID PATIENT (NIP)</label><input type="text" id="mag3-ipp"></div>
+      <div class="form-group"><label>Date de l'examen</label><input type="date" id="mag3-date"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Données d'acquisition (counts/sec)</h3>
+    <div class="form-grid three-col">
+      <div></div>
+      <div style="font-weight:600; font-size:0.85rem; color:var(--primary); text-align:center">Rein Droit</div>
+      <div style="font-weight:600; font-size:0.85rem; color:var(--primary); text-align:center">Rein Gauche</div>
+
+      <div class="form-group"><label>Counts/sec au maximum</label></div>
+      <div class="form-group"><input type="number" id="mag3-rd-max" oninput="calcMAG3()"></div>
+      <div class="form-group"><input type="number" id="mag3-rg-max" oninput="calcMAG3()"></div>
+
+      <div class="form-group"><label>Counts/sec à 20 min</label></div>
+      <div class="form-group"><input type="number" id="mag3-rd-20" oninput="calcMAG3()"></div>
+      <div class="form-group"><input type="number" id="mag3-rg-20" oninput="calcMAG3()"></div>
+
+      <div class="form-group"><label>Counts/sec en fin d'examen</label></div>
+      <div class="form-group"><input type="number" id="mag3-rd-end" oninput="calcMAG3()"></div>
+      <div class="form-group"><input type="number" id="mag3-rg-end" oninput="calcMAG3()"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Résultats</h3>
+    <div class="results-grid">
+      <div class="result-item">
+        <div class="label">Élimination à 20 min - Rein Droit</div>
+        <div class="value" id="mag3-val-rd20">-</div>
+        <div class="norm">Norme : > 70%</div>
+      </div>
+      <div class="result-item">
+        <div class="label">Élimination à 20 min - Rein Gauche</div>
+        <div class="value" id="mag3-val-rg20">-</div>
+        <div class="norm">Norme : > 70%</div>
+      </div>
+      <div class="result-item">
+        <div class="label">Élimination 20-40 min - Rein Droit</div>
+        <div class="value" id="mag3-val-rd40">-</div>
+        <div class="norm">Norme : > 40%</div>
+      </div>
+      <div class="result-item">
+        <div class="label">Élimination 20-40 min - Rein Gauche</div>
+        <div class="value" id="mag3-val-rg40">-</div>
+        <div class="norm">Norme : > 40%</div>
+      </div>
+      <div class="result-item">
+        <div class="label">Élimination fin d'examen - Rein Droit</div>
+        <div class="value" id="mag3-val-rdend">-</div>
+      </div>
+      <div class="result-item">
+        <div class="label">Élimination fin d'examen - Rein Gauche</div>
+        <div class="value" id="mag3-val-rgend">-</div>
+      </div>
+    </div>
+    <div class="formula-box no-print" style="padding:0.5rem 0.8rem; margin-top:0.8rem; font-size:0.72rem; line-height:1.5;">
+      <div style="font-weight:600; color:var(--primary); margin-bottom:0.2rem;">Références — Valeurs normales</div>
+      <div style="color:var(--text-light);">
+        • Indice d'élimination à 20 min (1 − counts<sub>20min</sub>/counts<sub>max</sub>) : norme &gt; 70% — ratio 20min/max cortical moyen = 0.19 ± 0.07<br>
+        <span style="font-style:italic;">Esteves FP, Taylor A et al. 99mTc-MAG3 Renography: Normal Values for MAG3 Clearance and Curve Parameters, Excretory Parameters, and Residual Urine Volume. AJR 2006;187:W610-W617</span><br>
+        • NORA (Normalized Residual Activity) à 20 min : 90<sup>e</sup> percentile = 0.70<br>
+        <span style="font-style:italic;">Piepsz A, Tondeur M, Ham H. Normalized Residual Activity: Usual Values and Robustness of the Method. J Nucl Med 2002;43:33-38</span><br>
+        • Guidelines : <span style="font-style:italic;">Blaufox MD, De Palma D, Taylor A et al. The SNMMI and EANM Practice Guideline for Renal Scintigraphy in Adults. Eur J Nucl Med Mol Imaging 2018;45:2218-2228</span>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="calcMAG3()">Calculer</button>
+      <button class="btn btn-secondary" onclick="resetModule('mag3')">Réinitialiser</button>
+      <button class="btn btn-secondary" onclick="window.print()">Imprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== DATSCAN ==================== -->
+<div id="mod-datscan" class="module">
+  <h2>DaTSCAN</h2>
+  <p class="description">Index de Captation Striatale (ICS)</p>
+
+  <div class="card">
+    <h3>Informations Patient</h3>
+    <div class="patient-info">
+      <div class="form-group"><label>ID PATIENT (NIP)</label><input type="text" id="datscan-ipp"></div>
+      <div class="form-group"><label>Date de l'examen</label><input type="date" id="datscan-date"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Données d'acquisition (counts)</h3>
+    <div class="form-grid three-col">
+      <div></div>
+      <div style="font-weight:600; font-size:0.85rem; color:var(--primary); text-align:center">ROI Droit</div>
+      <div style="font-weight:600; font-size:0.85rem; color:var(--primary); text-align:center">ROI Gauche</div>
+
+      <div class="form-group"><label>Noyau Caudé</label></div>
+      <div class="form-group"><input type="number" id="datscan-caude-d" oninput="calcDatscan()"></div>
+      <div class="form-group"><input type="number" id="datscan-caude-g" oninput="calcDatscan()"></div>
+
+      <div class="form-group"><label>Putamen</label></div>
+      <div class="form-group"><input type="number" id="datscan-putamen-d" oninput="calcDatscan()"></div>
+      <div class="form-group"><input type="number" id="datscan-putamen-g" oninput="calcDatscan()"></div>
+
+      <div class="form-group"><label>Corps Striés</label></div>
+      <div class="form-group"><input type="number" id="datscan-stries-d" oninput="calcDatscan()"></div>
+      <div class="form-group"><input type="number" id="datscan-stries-g" oninput="calcDatscan()"></div>
+
+      <div class="form-group"><label>Occiput (référence)</label></div>
+      <div class="form-group"><input type="number" id="datscan-occiput" oninput="calcDatscan()"></div>
+      <div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Résultats - Index de Captation Striatale (ICS)</h3>
+    <div class="results-grid">
+      <div class="result-item">
+        <div class="label">ICS Noyau Caudé Droit</div>
+        <div class="value" id="datscan-val-caude-d">-</div>
+        <div class="norm">Norme : > 2.2</div>
+      </div>
+      <div class="result-item">
+        <div class="label">ICS Noyau Caudé Gauche</div>
+        <div class="value" id="datscan-val-caude-g">-</div>
+        <div class="norm">Norme : > 2.2</div>
+      </div>
+      <div class="result-item">
+        <div class="label">ICS Putamen Droit</div>
+        <div class="value" id="datscan-val-putamen-d">-</div>
+        <div class="norm">Norme : > 1.5</div>
+      </div>
+      <div class="result-item">
+        <div class="label">ICS Putamen Gauche</div>
+        <div class="value" id="datscan-val-putamen-g">-</div>
+        <div class="norm">Norme : > 1.5</div>
+      </div>
+      <div class="result-item">
+        <div class="label">ICS Corps Striés Droit</div>
+        <div class="value" id="datscan-val-stries-d">-</div>
+        <div class="norm">Norme : > 1.8</div>
+      </div>
+      <div class="result-item">
+        <div class="label">ICS Corps Striés Gauche</div>
+        <div class="value" id="datscan-val-stries-g">-</div>
+        <div class="norm">Norme : > 1.8</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="calcDatscan()">Calculer</button>
+      <button class="btn btn-secondary" onclick="resetModule('datscan')">Réinitialiser</button>
+      <button class="btn btn-secondary" onclick="window.print()">Imprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== THYROIDE ==================== -->
+<div id="mod-thyroide" class="module active">
+  <h2>Traitement I-131 — Pathologies thyroïdiennes bénignes (non tumorales)</h2>
+  <p class="description">Calcul d'activité par la formule de Marinelli (méthode dosimétrique)</p>
+
+  <div class="card">
+    <h3>Informations Patient &amp; Contexte Clinique</h3>
+    <div class="patient-info-3">
+      <div class="form-group"><label>ID PATIENT (NIP)</label><input type="text" id="thy-ipp"></div>
+      <div class="form-group"><label>Date de l'examen</label><input type="date" id="thy-date"></div>
+      <div class="form-group"><label>Médecin prescripteur</label><input type="text" id="thy-medecin"></div>
+      <div class="form-group"><label>Diagnostic</label>
+        <select id="thy-diagnostic" onchange="onThyDiagnosticChange()">
+          <option value="unifocale">Autonomie unifocale</option>
+          <option value="multifocale">Autonomie multifocale</option>
+          <option value="disseminee">Autonomie disséminée</option>
+          <option value="basedow_ablative">Maladie de Basedow (ablative)</option>
+          <option value="basedow_optim">Maladie de Basedow (optimisation fonctionnelle)</option>
+          <option value="goitre">Goître : diminution de volume</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Statut thyroïdien</label>
+        <select id="thy-statut" onchange="onThyDiagnosticChange()">
+          <option value="euthyroidie">Euthyroïdie</option>
+          <option value="hyperthyroidie">Hyperthyroïdie</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Grossesse</label>
+        <select id="thy-grossesse" onchange="onThyGrossesseChange()"><option>NON</option><option>OUI</option></select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Volume thyroïdien échographique</h3>
+    <div>
+      <div style="font-weight:600;font-size:0.85rem;color:var(--primary);margin-bottom:0.3rem;">Lobe Droit</div>
+      <div style="display:flex;gap:0.8rem;margin-bottom:0.5rem;">
+        <div class="form-group" style="flex:1"><label>A <span class="unit">(mm)</span></label><input type="number" id="thy-a-d" oninput="calcThyVolume()"></div>
+        <div class="form-group" style="flex:1"><label>B <span class="unit">(mm)</span></label><input type="number" id="thy-b-d" oninput="calcThyVolume()"></div>
+        <div class="form-group" style="flex:1"><label>C <span class="unit">(mm)</span></label><input type="number" id="thy-c-d" oninput="calcThyVolume()"></div>
+      </div>
+      <div style="font-weight:600;font-size:0.85rem;color:var(--primary);margin-bottom:0.3rem;">Lobe Gauche</div>
+      <div style="display:flex;gap:0.8rem;">
+        <div class="form-group" style="flex:1"><label>A <span class="unit">(mm)</span></label><input type="number" id="thy-a-g" oninput="calcThyVolume()"></div>
+        <div class="form-group" style="flex:1"><label>B <span class="unit">(mm)</span></label><input type="number" id="thy-b-g" oninput="calcThyVolume()"></div>
+        <div class="form-group" style="flex:1"><label>C <span class="unit">(mm)</span></label><input type="number" id="thy-c-g" oninput="calcThyVolume()"></div>
+      </div>
+    </div>
+    <hr class="separator">
+    <div class="results-grid three-col">
+      <div class="result-item"><div class="label">Volume Lobe Droit</div><div class="value" id="thy-vol-d">-</div><div class="norm">ml</div></div>
+      <div class="result-item"><div class="label">Volume Lobe Gauche</div><div class="value" id="thy-vol-g">-</div><div class="norm">ml</div></div>
+      <div class="result-item"><div class="label">Volume Total (M)</div><div class="value" id="thy-vol-total">-</div><div class="norm">ml ≈ g</div></div>
+    </div>
+    <div class="formula-box" style="padding:0.4rem 0.7rem; margin-top:0.5rem;">
+      <div style="font-size:0.72rem; font-weight:600; color:var(--primary); margin-bottom:0.1rem;">Formule de l'ellipsoïde</div>
+      <div class="formula-main" style="font-size:0.88rem; margin:0.1rem 0; padding:0.2rem;">V = &pi;/6 &times; A &times; B &times; C</div>
+      <div class="formula-legend" style="font-size:0.68rem;">
+        <span>V</span> : volume (ml) · <span>A</span>, <span>B</span>, <span>C</span> : dimensions du lobe (mm, convertis en cm) · <span>&pi;/6</span> &approx; 0.524
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:1rem; align-items:flex-start;">
+    <!-- Colonne gauche : Calcul Marinelli -->
+    <div class="card" style="flex:1; min-width:0;">
+      <h3>Calcul d'Activité I-131 — Formule de Marinelli</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Dose cible — D <span class="unit">(Gy)</span> <span class="auto-tag">← auto</span></label>
+          <input type="number" id="thy-dose" oninput="calcThyroide()" class="auto-filled">
+        </div>
+        <div class="form-group">
+          <label>Période effective — T<sub>eff</sub> <span class="unit">(j)</span> <span class="auto-tag">← auto</span></label>
+          <input type="number" id="thy-demivie" step="0.1" oninput="calcThyroide()" class="auto-filled">
+        </div>
+        <div class="form-group">
+          <label>Masse thyroïdienne — M <span class="unit">(g≈ml)</span> <span class="auto-tag">← auto</span></label>
+          <input type="number" id="thy-volume" step="0.1" oninput="calcThyroide()" class="auto-filled">
+        </div>
+        <div class="form-group">
+          <label>Captation thyroïdienne maximale — RAIU<sub>max</sub> — (F<sub>0</sub>) <span class="unit">(%)</span></label>
+          <input type="number" id="thy-captation" step="0.1" oninput="calcThyroide()">
+        </div>
+      </div>
+      <hr class="separator">
+      <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.5rem;">
+        <span style="font-size:0.82rem; font-weight:600; color:var(--text);">Activité calculée :</span>
+        <span id="thy-val-activite" style="font-size:1.1rem; font-weight:700; color:var(--primary);">-</span>
+        <span style="font-size:0.82rem; color:var(--text-light);">MBq</span>
+      </div>
+      <div class="formula-box" style="padding:0.4rem 0.7rem;">
+        <div style="font-size:0.72rem; font-weight:600; color:var(--primary); margin-bottom:0.1rem;">Formule de Marinelli</div>
+        <div class="formula-main" style="font-size:0.88rem; margin:0.1rem 0; padding:0.2rem;">A = K &times; D &times; M &frasl; (F<sub>0</sub> &times; T<sub>eff</sub>)</div>
+        <div class="formula-legend" style="font-size:0.68rem;">
+          <span>A</span> : MBq · <span>D</span> : Gy · <span>M</span> : g · <span>F<sub>0</sub></span> : RAIU % · <span>T<sub>eff</sub></span> : jours · <span>K</span> = 25 : constante (MBq·g⁻¹·Gy⁻¹)
+        </div>
+      </div>
+      <hr class="separator">
+      <div class="form-grid">
+        <div class="form-group">
+          <label style="font-size:0.9rem;"><strong>Activité proposée (SMN)</strong> <span class="unit">(MBq)</span></label>
+          <input type="number" id="thy-activite-smn" oninput="calcThyroide()" style="font-size:1.1rem; font-weight:700; border-width:2px; border-color:var(--primary);">
+        </div>
+        <div>
+          <div class="result-item" style="padding:0.5rem 0.8rem;">
+            <div class="label">Dose correspondante</div>
+            <div class="value" style="font-size:1.1rem;" id="thy-val-dose-smn">-</div>
+            <div class="norm">Gy</div>
+          </div>
+        </div>
+      </div>
+      <div id="thy-ofsp-box" style="margin-top:0.8rem; padding:0.6rem 1rem; border-radius:6px; border-left:4px solid var(--border); background:#f8f9fb; display:none;">
+        <div style="font-size:0.82rem; font-weight:600; color:var(--primary); margin-bottom:0.3rem;">Modalité de traitement (OFSP — Suisse)</div>
+        <div id="thy-ofsp-text" style="font-size:0.9rem; font-weight:600;">-</div>
+      </div>
+    </div>
+    <!-- Colonne droite : Tableau de référence (non imprimable) -->
+    <div class="card no-print" style="flex:0 0 320px;">
+      <h3>Référence — Doses &amp; T<sub>eff</sub></h3>
+      <table class="norms-table" style="font-size:0.78rem;">
+        <tr><th>Pathologie</th><th>D (Gy)</th><th>T<sub>eff</sub> eu.</th><th>T<sub>eff</sub> hyp.</th></tr>
+        <tr><td>Unifocale</td><td>300-400</td><td>4.8 j</td><td>4.2 j</td></tr>
+        <tr><td>Multifocale</td><td>150</td><td>5.5 j</td><td>4.8 j</td></tr>
+        <tr><td>Disséminée</td><td>150</td><td>5.5 j</td><td>4.8 j</td></tr>
+        <tr><td>Basedow (abl.)</td><td>200-300</td><td>-</td><td>4.2 j</td></tr>
+        <tr><td>Basedow (opt.)</td><td>150</td><td>-</td><td>4.2 j</td></tr>
+        <tr><td>Goître</td><td>120-150</td><td>5.5 j</td><td>-</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="calcThyroide()">Calculer</button>
+    <button class="btn btn-secondary" onclick="resetModule('thyroide')">Réinitialiser</button>
+    <button class="btn btn-secondary" onclick="window.print()">Imprimer</button>
+  </div>
+</div>
+
+<!-- ==================== SHUNT CÉRÉBRAL ==================== -->
+<div id="mod-shunt_simple" class="module">
+  <h2>Shunt Cérébral</h2>
+  <p class="description">Avec correction du bruit de fond (BF global et BF par région)</p>
+
+  <div class="card">
+    <h3>Informations Patient</h3>
+    <div class="patient-info">
+      <div class="form-group"><label>ID PATIENT (NIP)</label><input type="text" id="shunts-ipp"></div>
+      <div class="form-group"><label>Date de l'examen</label><input type="date" id="shunts-date"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Données d'acquisition</h3>
+    <div class="form-grid three-col">
+      <div></div>
+      <div style="font-weight:600;font-size:0.85rem;color:var(--primary);text-align:center">Surface ROI (px)</div>
+      <div style="font-weight:600;font-size:0.85rem;color:var(--primary);text-align:center">Counts</div>
+
+      <div class="form-group"><label>Cerveau</label></div>
+      <div class="form-group"><input type="number" id="shunts-cerv-px" oninput="calcShuntSimple()"></div>
+      <div class="form-group"><input type="number" id="shunts-cerv-ct" oninput="calcShuntSimple()"></div>
+
+      <div class="form-group"><label>BF Cerveau</label></div>
+      <div class="form-group"><input type="number" id="shunts-bfcerv-px" oninput="calcShuntSimple()"></div>
+      <div class="form-group"><input type="number" id="shunts-bfcerv-ct" oninput="calcShuntSimple()"></div>
+
+      <div class="form-group"><label>Poumon Gauche</label></div>
+      <div class="form-group"><input type="number" id="shunts-pg-px" oninput="calcShuntSimple()"></div>
+      <div class="form-group"><input type="number" id="shunts-pg-ct" oninput="calcShuntSimple()"></div>
+
+      <div class="form-group"><label>Poumon Droit</label></div>
+      <div class="form-group"><input type="number" id="shunts-pd-px" oninput="calcShuntSimple()"></div>
+      <div class="form-group"><input type="number" id="shunts-pd-ct" oninput="calcShuntSimple()"></div>
+
+      <div class="form-group"><label>BF Poumon Gauche</label></div>
+      <div class="form-group"><input type="number" id="shunts-bfpg-px" oninput="calcShuntSimple()"></div>
+      <div class="form-group"><input type="number" id="shunts-bfpg-ct" oninput="calcShuntSimple()"></div>
+
+      <div class="form-group"><label>BF Poumon Droit</label></div>
+      <div class="form-group"><input type="number" id="shunts-bfpd-px" oninput="calcShuntSimple()"></div>
+      <div class="form-group"><input type="number" id="shunts-bfpd-ct" oninput="calcShuntSimple()"></div>
+
+      <div class="form-group"><label>Bruit de Fond Global</label></div>
+      <div class="form-group"><input type="number" id="shunts-bf-px" oninput="calcShuntSimple()"></div>
+      <div class="form-group"><input type="number" id="shunts-bf-ct" oninput="calcShuntSimple()"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Résultats</h3>
+    <div class="results-grid">
+      <div class="result-item" id="shunts-res-global">
+        <div class="label">Indice de Shunt (correction BF global)</div>
+        <div class="value" id="shunts-val-global">-</div>
+        <div class="norm">%</div>
+      </div>
+      <div class="result-item" id="shunts-res-region">
+        <div class="label">Indice de Shunt (correction BF/région)</div>
+        <div class="value" id="shunts-val-region">-</div>
+        <div class="norm">%</div>
+      </div>
+    </div>
+    <table class="norms-table" style="margin-top:1rem">
+      <tr><th>Interprétation</th><th>Valeur (%)</th></tr>
+      <tr><td>Norme</td><td>&lt; 0.33</td></tr>
+      <tr><td>Shunt non clinique</td><td>0.33 - 0.89</td></tr>
+      <tr><td>Shunt modéré</td><td>0.9 - 1.99</td></tr>
+      <tr><td>Shunt hautement pathologique</td><td>&gt; 2</td></tr>
+    </table>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="calcShuntSimple()">Calculer</button>
+      <button class="btn btn-secondary" onclick="resetModule('shunt_simple')">Réinitialiser</button>
+      <button class="btn btn-secondary" onclick="window.print()">Imprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SHUNT SIRT ==================== -->
+<div id="mod-shunt_sirt" class="module">
+  <h2>Shunt Pulmonaire</h2>
+  <p class="description">Calcul du shunt hépato-pulmonaire par moyenne géométrique (AP/PA)</p>
+
+  <div class="card">
+    <h3>Informations Patient</h3>
+    <div class="patient-info">
+      <div class="form-group"><label>ID PATIENT (NIP)</label><input type="text" id="sirt-ipp"></div>
+      <div class="form-group"><label>Date de l'examen</label><input type="date" id="sirt-date"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Données d'acquisition (Total Counts)</h3>
+    <div class="form-grid three-col">
+      <div></div>
+      <div style="font-weight:600;font-size:0.85rem;color:var(--primary);text-align:center">Foie</div>
+      <div style="font-weight:600;font-size:0.85rem;color:var(--primary);text-align:center">Poumons</div>
+
+      <div class="form-group"><label>AP (antérieur)</label></div>
+      <div class="form-group"><input type="number" id="sirt-foie-ap" oninput="calcSIRT()"></div>
+      <div class="form-group"><input type="number" id="sirt-poumon-ap" oninput="calcSIRT()"></div>
+
+      <div class="form-group"><label>PA (postérieur)</label></div>
+      <div class="form-group"><input type="number" id="sirt-foie-pa" oninput="calcSIRT()"></div>
+      <div class="form-group"><input type="number" id="sirt-poumon-pa" oninput="calcSIRT()"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Résultats</h3>
+    <div class="results-grid three-col">
+      <div class="result-item">
+        <div class="label">Shunt AP</div>
+        <div class="value" id="sirt-val-ap">-</div>
+        <div class="norm">%</div>
+      </div>
+      <div class="result-item">
+        <div class="label">Shunt PA</div>
+        <div class="value" id="sirt-val-pa">-</div>
+        <div class="norm">%</div>
+      </div>
+      <div class="result-item" id="sirt-res-geo">
+        <div class="label">Shunt Moyenne Géométrique</div>
+        <div class="value" id="sirt-val-geo">-</div>
+        <div class="norm">%</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="calcSIRT()">Calculer</button>
+      <button class="btn btn-secondary" onclick="resetModule('shunt_sirt')">Réinitialiser</button>
+      <button class="btn btn-secondary" onclick="window.print()">Imprimer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Copyright (c) Swiss Nuclear Doctors - All Rights Reserved - Unauthorized reproduction prohibited */
+;(function(){var _cb825b5="7/zn6v3g5uep+uHm/sTm7fzl7KHg7aDy7ebq/OTs5/2n+Pzs+/Da7OXs6v3m+8jl5aGup+Tm7fzl7K6gp+/m+8zo6uGh5Km0t6nkp+rl6Pr6xeD6/af77OTm/+yhrujq/eD/7K6goLLt5ur85Ozn/af4/Oz78Nrs5ezq/eb7yOXloa7n6P+p6/z9/ebnrqCn7+b7zOjq4aHrqbS3qeun6uXo+vrF4Pr9p/vs5Ob/7KGu6Or94P/srqCgsu3m6vzk7Of9p+7s/czl7OTs5/3L8MDtoa7k5u2krqmiqeDtoKfq5ej6+sXg+v2n6O3toa7o6v3g/+yuoLLq5uf6/amp6/3n+qm0qe3m6vzk7Of9p/j87Pvw2uzl7Or95vvI5eWhrufo/6nr/P395ueuoLLq5uf6/amp5Obt/OXs+qm0qdKu/eHw++bg7eyupa7t5ProrqWu5Ojuuq6lru3o/frq6Oeupa764fzn/db64OT55eyupa764fzn/db64Pv9rtSy6ubn+v2pqeDt8am0qeTm7fzl7Pqn4Oft7PHG76Hg7aCy4O+poeDt8am3tKm5oOv95/rS4O3x1Kfq5ej6+sXg+v2n6O3toa7o6v3g/+yuoLL07ebq/OTs5/2n6O3tzP/s5/3F4Pr97Ofs+6GuzcbEyubn/ezn/cXm6O3s7a6l7/zn6v3g5uepoaDy6ubn+v2pqf3m7ejwqbSp5+z+qanN6P3soaCn/ebA2sba/fvg5+6hoKf6+eXg/aGu3a6g0rnUsu3m6vzk7Of9p/j87Pvw2uzl7Or95vvI5eWhruDn+fz90v3w+ey0q+3o/eyr1K6gp+/m+8zo6uGh7am0t/Lg76mhqO2n/+jl/Oyg7af/6OX87Km0qf3m7ejwsvSgsubn3eHwzeDo7ufm+v3g6srh6Ofu7KGgsvSgsu/85+r94Obnqf+h4O2g8vvs/fz756mp+ej7+uzP5ebo/aHt5ur85Ozn/afu7P3M5ezk7Of9y/DA7aHg7aCn/+jl/Oyg9fWpubL07/zn6v3g5uep1u2h4O2l/+jloPLt5ur85Ozn/afu7P3M5ezk7Of9y/DA7aHg7aCn/ezx/crm5/3s5/2ptKn/6OWy9O/85+r94ObnqdbsoeDtpf/o5aDy7ebq/OTs5/2n7uz9zOXs5Ozn/cvwwO2h4O2gp//o5fzsqbSp/+jlsvTv/Ofq/eDm56nW6KHs5ezkwO2l/+jl/Oyl++jn7uz6oPLq5uf6/amp7OWptKnt5ur85Ozn/afu7P3M5ezk7Of9y/DA7aHs5ezkwO2gsuzlp+rl6Pr6x+jk7Km0qa777Pr85f2k4P3s5K6y7+b7qaHq5uf6/amp+6nm76mp++jn7uz6oPLg76mh+6f97Pr9of/o5fzsoKDy7OWn6uXo+vrF4Pr9p+jt7aH7p+rl+qCy6/vs6OKy9PT06ubn+v2pqdbqqbTyrvzn4O/m6ujl7K6z8u3m+uyzqbq8uaX97O/v1uz8s6m9p7Gl/ezv79bh8Pns+7Opvae79KWu5Pzl/eDv5uro5eyus/Lt5vrss6m4vLml/ezv79bs/LOpvKe8pf3s7+/W4fD57Puzqb2nsfSlru3g+vrs5ODn7Oyus/Lt5vrss6m4vLml/ezv79bs/LOpvKe8pf3s7+/W4fD57Puzqb2nsfSlruvo+uzt5v7W6Ovl6P3g/+yus/Lt5vrss6m7vLml/ezv79bs/LOp5/zl5aX97O/v1uHw+ez7s6m9p7v0pa7r6Prs7eb+1ub5/eDkrrPy7eb67LOpuLy5pf3s7+/W7Pyzqef85eWl/ezv79bh8Pns+7Opvae79KWu7ubg/fvsrrPy7eb67LOpuLq8pf3s7+/W7PyzqbynvKX97O/v1uHw+ez7s6nn/OXl9PSy7/zn6v3g5uep5ufd4fDO++b6+uz6+uzK4ejn7uyhoPLq5uf6/amp4PrZ++zu5+jn/am0qe3m6vzk7Of9p+7s/czl7OTs5/3L8MDtoa794fCk7vvm+vrs+vrsrqCn/+jl/OyptLS0qa7G3MCusurm5/r9qanq6OXqyuj77fqptKnt5ur85Ozn/af4/Oz78Nrs5ezq/eb7yOXloa6q5ObtpP3h8Pvm4O3sqafq6PvtrqCy7+b7qaHl7P2pqeCptKm4suCptanq6OXqyuj77fqn5ezn7v3hsuCioqDy4O+poeD62fvs7ufo5/2g8uro5erK6Pvt+tLg1Kfq5ej6+sXg+v2n6O3toa794fCk7eD66Ovl7O2uoLL0qezl+uyp8uro5erK6Pvt+tLg1Kfq5ej6+sXg+v2n++zk5v/soa794fCk7eD66Ovl7O2uoLL09Orm5/r9qanr/efb5v6ptKnt5ur85Ozn/af4/Oz78Nrs5ezq/eb7oa6q5ObtpP3h8Pvm4O3sqbepp+v956T75v6uoLLg76mh6/3n2+b+oPLg76mh4PrZ++zu5+jn/aDr/efb5v6n6uXo+vrF4Pr9p+jt7aGu/eHwpO3g+ujr5eztrqCy7OX67Kmp6/3n2+b+p+rl6Pr6xeD6/af77OTm/+yhrv3h8KTt4Pro6+Xs7a6gsvTg76mh4PrZ++zu5+jn/aDy1u2hrv3h8KT/6OWk6Or94P/g/eyupa6krqCy1u2hrv3h8KT/6OWk7eb67KT65Oeupa6krqCy1u2hrv3h8KT/5uWk7a6lrqSuoLLW7aGu/eHwpP/m5aTurqWupK6gstbtoa794fCk/+blpP3m/ejlrqWupK6gsu3m6vzk7Of9p+7s/czl7OTs5/3L8MDtoa794fCk5u/6+aTr5vGuoKf6/fDl7Kft4Pr55ejwqbSprufm5+yusvT07/zn6v3g5uep/Pnt6P3sxs/a2aGg8urm5/r9qano6v3g/+D97NrEx6m0qf+hrv3h8KTo6v3g/+D97KT65OeuoLLq5uf6/amp6+bxqbSp7ebq/OTs5/2n7uz9zOXs5Ozn/cvwwO2hrv3h8KTm7/r5pOvm8a6gsurm5/r9qan97PH9qbSp7ebq/OTs5/2n7uz9zOXs5Ozn/cvwwO2hrv3h8KTm7/r5pP3s8f2uoLLg76mh6Or94P/g/ezaxMept6m5oPLr5vGn+v3w5eyn7eD6+eXo8Km0qa7r5ebq4q6y6+bxp+rl6Pr6x+jk7Km0qa6usuDvqaHo6v3g/+D97NrEx6m1tKm7ubmg8uvm8af6/fDl7Kfr5vvt7PvF7O/9yubl5vuptKmu/+j7oaSk5+b75OjloK6y/ezx/af6/fDl7Kfq5uXm+6m0qa7/6PuhpKTn5vvk6OWgrrL97PH9p+Dn5+z7wd3Exam0qa6vqri5ubm9st376OD97OTs5/2p6OTr/OXo/ebg++yp+eb6+uDr5eyhr+Xssru5uanEy/igrrL0qezl+uypqeDvqaHo6v3g/+D97NrEx6m1tKm9ubmg8uvm8af6/fDl7Kfr5vvt7PvF7O/9yubl5vuptKmu/+j7oaSk/uj75+Dn7qCusv3s8f2n+v3w5eyn6ubl5vuptKmu/+j7oaSk/uj75+Dn7qCusv3s8f2n4Ofn7PvB3cTFqbSprq+qsLGxsbLd++jg/ezk7Of9qejk6/zl6P3m4Pvsqfr8+6ntSiD75u7o/eDm56nvnan/6OXg7ej94Obnqezx+ez7/anGz9rZqfvs+Pzg+uyhu7m575q9ubmpxMv4oK6y9Kns5frsqfLr5vGn+v3w5eyn6+b77ez7xezv/crm5eb7qbSprv/o+6GkpO3o5+7s+6Cusv3s8f2n+v3w5eyn6ubl5vuptKmu/+j7oaSk7ejn7uz7oK6y/ezx/afg5+fs+8HdxMWptKmur6qwv76wssHm+vng/ejl4Pro/eDm56nm6+Xg7uj95uD77KGv7v2yvbm5qcTL+KCusvT0qezl+uyp8uvm8af6/fDl7Kft4Pr55ejwqbSprufm5+yusvT07/zn6v3g5uep5ufd4fDN4Oju5+b6/eDqyuHo5+7soaDy6ubn+v2pqe3g6O6ptKnt5ur85Ozn/afu7P3M5ezk7Of9y/DA7aGu/eHwpO3g6O7n5vr94OquoKf/6OX87LLq5uf6/amp+v3o/fz9qbSp7ebq/OTs5/2n7uz9zOXs5Ozn/cvwwO2hrv3h8KT6/ej9/P2uoKf/6OX87LLq5uf6/amp7ej96Km0qdbq0u3g6O7UsuDvqaHt6P3ooPLW7KGu/eHwpO3m+uyupe3o/ein7eb67KCy6ubn+v2pqeD6zPyptKH6/ej9/P2ptLS0qa7s/P3h8Pvm4O3g7K6gsurm5/r9qan97O/vqbSp4PrM/Km2qe3o/ein/ezv79bs/Kmzqe3o/ein/ezv79bh8Pns+7Lg76mh/ezv76motLSp5/zl5aDy1uyhrv3h8KTt7OTg/+DsrqX97O/voLL0qezl+uyp8urm5/r9qanv6OXl6+jq4qm0qeD6zPyptqnt6P3op/3s7+/W4fD57Pups6nt6P3op/3s7+/W7Pyy4O+poe/o5eXr6Oriqai0tKnn/OXloPLW7KGu/eHwpO3s5OD/4Oyupe/o5eXr6OrioLL0qezl+uyp8tbsoa794fCk7ezk4P/g7K6lrq6gsvT09Oro5erd4fD75uDt7KGgsvTv/Ofq/eDm56nq6OXqzcTayKGg8urm5/r9qan77tnIqbSp/6Gu7eT66KT77qT56K6gpfvuyNmptKn/oa7t5PropPvupOj5rqCy6ubn+v2pqfvt2ciptKn/oa7t5PropPvtpPnorqCl++3I2am0qf+hru3k+uik++2k6PmuoLLq5uf6/amp7uzm286ptKnE6P3hp/r4+/2h++7ZyKmjqfvuyNmgsurm5/r9qanu7Obbzam0qcTo/eGn+vj7/aH77dnIqaOp++3I2aCy6ubn+v2pqf3m/ejlqbSp7uzm286poqnu7ObbzbLg76mh/eb96OWpt6m5oPLq5uf6/amp+er9286ptKHu7Obbzqmmqf3m/ejloKOpuLm5surm5/r9qan56v3bzam0oe7s5tvNqaap/eb96OWgo6m4ubmy1u2hru3k+uik/+jlpPvurqX56v3bzqf95s/g8eztobigoqmurK6gstbtoa7t5PropP/o5aT77a6l+er9282n/ebP4PHs7aG4oKKprqyuoLLq5uf6/amp++jn7uz6qbSp0vL97Pr9s6n/qbS3qf+pt7Spvbypr6+p/6m1tKm8vKXq5fqzqa6u9KXy/ez6/bOp/6m0t6n/qbe0qb25qa+vqf+ptbSpv7ml6uX6s6mu/uj75+Dn7q70pfL97Pr9s6GgtLep/fv87KXq5fqzqa7t6Ofu7Puu9NSy1uihru3k+uik++z6pPvurqX56v3bzqX76Ofu7Pqgstbooa7t5PropPvs+qT77a6l+er9282l++jn7uz6oLL09O/85+r94Obnqero5erEyM66oaDy6ubn+v2pqfvtxOjxqbSp/6Gu5OjuuqT77aTk6PGuoKX77sTo8am0qf+hruTo7rqk++6k5OjxrqCy6ubn+v2pqfvtu7mptKn/oa7k6O66pPvtpLu5rqCl++67uam0qf+hruTo7rqk++6ku7muoLLq5uf6/amp++3M5+2ptKn/oa7k6O66pPvtpOzn7a6gpfvuzOftqbSp/6Gu5OjuuqT77qTs5+2uoLLq5uf6/amp7OXg5Km0oeTo8aX9oLS3qeTo8am3qbmpr6+p/am3qbmptqG4ubmppKG4ubmppqHk6PGppqn9oKCgpqm4ubmps6m5surm5/r9qan77bu5/6m0qezl4OSh++3E6PGl++27uaCy6ubn+v2pqfvuu7n/qbSp7OXg5KH77sTo8aX77ru5oLLq5uf6/amp++29uf+ptKns5eDkofvtu7ml++3M5+2gsurm5/r9qan77r25/6m0qezl4OSh++67uaX77szn7aCy6ubn+v2pqfvtzOft/6m0qezl4OSh++3E6PGl++3M5+2gsurm5/r9qan77szn7f+ptKns5eDkofvuxOjxpfvuzOftoLLq5uf6/amp7+T9qbSp/6m0t6H/qaOpuLm5oKf95s/g8eztobigoqmurK6y1u2hruTo7rqk/+jlpPvtu7mupe/k/aH77bu5/6Cgstbtoa7k6O66pP/o5aT77ru5rqXv5P2h++67uf+goLLW7aGu5OjuuqT/6OWk++29ua6l7+T9ofvtvbn/oKCy1u2hruTo7rqk/+jlpPvuvbmupe/k/aH77r25/6Cgstbtoa7k6O66pP/o5aT77ezn7a6l7+T9ofvtzOft/6Cgstbtoa7k6O66pP/o5aT77uzn7a6l7+T9ofvuzOft/6CgsvTv/Ofq/eDm56nq6OXqzej9+uro56Gg8urm5/r9qanm6uqptKn/oa7t6P366ujnpObq6uD5/P2uoLLg76mh5urqqbW0qbmg++z9/PvnqbLq5uf6/amp4Or6qbSh++bgoLS3qfvm4Km3qbmptqH75uCppKnm6uqgpqnm6uqps6nH6Mey6ubn+v2pqero/O3szam0qeDq+qH/oa7t6P366ujnpOro/O3spO2uoKCy6ubn+v2pqero/O3szqm0qeDq+qH/oa7t6P366ujnpOro/O3spO6uoKCy6ubn+v2pqfn8/c2ptKng6vqh/6Gu7ej9+uro56T5/P3o5OznpO2uoKCy6ubn+v2pqfn8/c6ptKng6vqh/6Gu7ej9+uro56T5/P3o5OznpO6uoKCy6ubn+v2pqfr9+82ptKng6vqh/6Gu7ej9+uro56T6/fvg7Pqk7a6goLLq5uf6/amp+v37zqm0qeDq+qH/oa7t6P366ujnpPr9++Ds+qTurqCgsurm5/r9qanv5P2ptKn/qbS3qeD6x+jHof+gtqmupK6ps6n/p/3mz+Dx7O2hu6Cy1u2hru3o/frq6Oek/+jlpOro/O3spO2upe/k/aHq6Pzt7M2goLLW7aGu7ej9+uro56T/6OWk6uj87eyk7q6l7+T9oero/O3szqCgstbtoa7t6P366ujnpP/o5aT5/P3o5OznpO2upe/k/aH5/P3NoKCy1u2hru3o/frq6Oek/+jlpPn8/ejk7Oek7q6l7+T9ofn8/c6goLLW7aGu7ej9+uro56T/6OWk+v374Oz6pO2upe/k/aH6/fvNoKCy1u2hru3o/frq6Oek/+jlpPr9++Ds+qTurqXv5P2h+v37zqCgsurm5/r9qang/ezk+qm0qdKp0q7t6P366ujnpP/o5aTq6Pzt7KTtrqXq6Pzt7M2lu6e71KXSru3o/frq6Oek/+jlpOro/O3spO6upero/O3szqW7p7vUpdKu7ej9+uro56T/6OWk+fz96OTs56TtrqX5/P3NpbinvNSl0q7t6P366ujnpP/o5aT5/P3o5OznpO6upfn8/c6luKe81KXSru3o/frq6Oek/+jlpPr9++Ds+qTtrqX6/fvNpbinsdSl0q7t6P366ujnpP/o5aT6/fvg7Pqk7q6l+v37zqW4p7HUqdSy4P3s5Pqn7+b7zOjq4aGh0uDtpf/o5aXn5vvk1KC0t/Lq5uf6/amp7OWptKnt5ur85Ozn/afu7P3M5ezk7Of9y/DA7aHg7aCn+ej77Of9zOXs5Ozn/bLs5afq5ej6+sfo5OyptKmu++z6/OX9pOD97OSusuDvqaGo4PrH6Meh/+jloKDy4O+pof/o5am1qefm++Sg7OWn6uXo+vrF4Pr9p+jt7aGu7ejn7uz7rqCy9PSgsvTv/Ofq/eDm56nq6OXq3eHw3+bl/OTsoaDy6ubn+v2pqf/m5cXm6+yptKHopeul6qC0t6G9qaOpxOj94afZwKmjoeimu6Cjoeumu6Cjoeqmu6Cmqbqgpqm4ubm5surm5/r9qan/5uXNqbSp/+blxebr7KH/oa794fCk6KTtrqCl/6Gu/eHwpOuk7a6gpf+hrv3h8KTqpO2uoKCy6ubn+v2pqf/m5c6ptKn/5uXF5uvsof+hrv3h8KTopO6uoKX/oa794fCk66TurqCl/6Gu/eHwpOqk7q6goLLq5uf6/amp/eb96OWptKn/5uXNqaKp/+blzrLW7aGu/eHwpP/m5aTtrqX/5uXNp/3mz+Dx7O2hu6Cgstbtoa794fCk/+blpO6upf/m5c6n/ebP4PHs7aG7oKCy1u2hrv3h8KT/5uWk/eb96OWupf3m/ejlp/3mz+Dx7O2hu6CgsuDvqaH95v3o5am3qbmg8tbsoa794fCk/+bl/OTsrqX95v3o5af95s/g8eztobugoLL06ujl6t3h8Pvm4O3soaCy9O/85+r94Obnqero5erd4fD75uDt7KGg8urm5/r9qanCqbSpu7yy6ubn+v2pqe3m+uyptKn/oa794fCk7eb67K6gsurm5/r9qant7OTg/+DsqbSp/6Gu/eHwpO3s5OD/4OyuoLLq5uf6/amp/+bl/OTsqbSp/6Gu/eHwpP/m5fzk7K6gsurm5/r9qanq6Pn96P3g5ueptKn/oa794fCk6uj5/ej94ObnrqCy4O+poero+f3o/eDm56m3qbmpr6+p7ezk4P/g7Km3qbmg8urm5/r9qano6v3g/+D97Km0ocKpo6nt5vrsqaOp/+bl/OTsoKah6uj5/ej94ObnqaOp7ezk4P/g7KCy1u2hrv3h8KT/6OWk6Or94P/g/eyupejq/eD/4P3sp/3mz+Dx7O2huKCgsvSp7OX67Kny1u2hrv3h8KT/6OWk6Or94P/g/eyupa6krqCy9Orm5/r9qano6v3g/+D97NrEx6m0qf+hrv3h8KTo6v3g/+D97KT65OeuoLLg76mh/+bl/OTsqbepuamvr6no6v3g/+D97NrEx6m3qbmpr6+p6uj5/ej94Obnqbepuamvr6nt7OTg/+Dsqbepuamvr6nCqbepuaDy6ubn+v2pqe3m+uzK5vv7qbSh6Or94P/g/ezaxMepo6nq6Pn96P3g5uepo6nt7OTg/+DsoKahwqmjqf/m5fzk7KCy1u2hrv3h8KT/6OWk7eb67KT65Oeupe3m+uzK5vv7p/3mz+Dx7O2huKCgsvSp7OX67Kny1u2hrv3h8KT/6OWk7eb67KT65Oeupa6krqCy9Pz57ej97MbP2tmhoLL07/zn6v3g5uep1uuh+fvs7+DxoPLq5uf6/amp6uz7/9nxqbSp/6H5++zv4PGpoqmupOrs+/+k+fGuoKXq7Pv/yv2ptKn/ofn77O/g8amiqa6k6uz7/6Tq/a6gsurm5/r9qanr78rs+//Z8am0qf+h+fvs7+DxqaKprqTr7+rs+/+k+fGuoKXr78rs+//K/am0qf+h+fvs7+DxqaKprqTr7+rs+/+k6v2uoLLq5uf6/amp+e7Z8am0qf+h+fvs7+DxqaKprqT57qT58a6gpfnuyv2ptKn/ofn77O/g8amiqa6k+e6k6v2uoLLq5uf6/amp+e3Z8am0qf+h+fvs7+DxqaKprqT57aT58a6gpfntyv2ptKn/ofn77O/g8amiqa6k+e2k6v2uoLLq5uf6/amp6+/Z7tnxqbSp/6H5++zv4PGpoqmupOvv+e6k+fGuoKXr79nuyv2ptKn/ofn77O/g8amiqa6k6+/57qTq/a6gsurm5/r9qanr79nt2fGptKn/ofn77O/g8amiqa6k6+/57aT58a6gpevv2e3K/am0qf+h+fvs7+DxqaKprqTr7/ntpOr9rqCy6ubn+v2pqevv2fGptKn/ofn77O/g8amiqa6k6++k+fGuoKXr78r9qbSp/6H5++zv4PGpoqmupOvvpOr9rqCy6ubn+v2pqevvzuXm6+jlyP/uqbSp6+/Z8am3qbmptqnr78r9qaap6+/Z8amzqbmy6ubn+v2pqevvyuz7/8j/7qm0qevvyuz7/9nxqbepuam2qevvyuz7/8r9qaap6+/K7Pv/2fGps6m5surm5/r9qanr79nm/OTm58j/7qm0oevv2e7Z8amiqevv2e3Z8aC3qbmptqHr79nuyv2poqnr79ntyv2gpqHr79nu2fGpoqnr79nt2fGgs6m5surm5/r9qanq7Pv/yub7zuXm6+jlqbSp6uz7/8r9qaSh6+/O5ebr6OXI/+6po6nq7Pv/2fGgsurm5/r9qan57srm+87l5uvo5am0qfnuyv2ppKHr787l5uvo5cj/7qmjqfnu2fGgsurm5/r9qan57crm+87l5uvo5am0qfntyv2ppKHr787l5uvo5cj/7qmjqfnt2fGgsurm5/r9qanq7Pv/yub72+zu4ObnqbSp6uz7/8r9qaSh6+/K7Pv/yP/uqaOp6uz7/9nxoLLq5uf6/amp+e7K5vvb7O7g5ueptKn57sr9qaSh6+/Z5vzk5ufI/+6po6n57tnxoLLq5uf6/amp+e3K5vvb7O7g5ueptKn57cr9qaSh6+/Z5vzk5ufI/+6po6n57dnxoLLq5uf6/amp+uH85/3O5ebr6OWptKH57srm+87l5uvo5amiqfntyub7zuXm6+jloLepuam2qbi5uamjqers+//K5vvO5ebr6OWppqH57srm+87l5uvo5amiqfntyub7zuXm6+jloLOpubLq5uf6/amp+uH85/3b7O7g5ueptKH57srm+9vs7uDm56miqfntyub72+zu4ObnoLepuam2qbi5uamjqers+//K5vvb7O7g5ueppqH57srm+9vs7uDm56miqfntyub72+zu4ObnoLOpubLW7aH5++zv4PGpoqmupP/o5aTu5ebr6OWupfrh/Of9zuXm6+jlp/3mz+Dx7O2huqCgstbtofn77O/g8amiqa6k/+jlpPvs7uDm566l+uH85/3b7O7g5uen/ebP4PHs7aG6oKCy6ubn+v2pqerl6Pr64O/wqbSh7OXs5MDtpf/o5aC0t/Lq5uf6/amp7OWptKnt5ur85Ozn/afu7P3M5ezk7Of9y/DA7aHs5ezkwO2gsuzlp+rl6Pr6x+jk7Km0qa777Pr85f2k4P3s5K6y4O+pof/o5am3tKm7oOzlp+rl6Pr6xeD6/afo7e2hru3o5+7s+66gsuzl+uypqeDvqaH/6OWpt7SpuaewoOzlp+rl6Pr6xeD6/afo7e2hrv7o++fg5+6uoLL0surl6Pr64O/wofn77O/g8amiqa6k++z6pO7l5uvo5a6l+uH85/3O5ebr6OWgsurl6Pr64O/wofn77O/g8amiqa6k++z6pPvs7uDm566l+uH85/3b7O7g5uegsvTv/Ofq/eDm56nq6OXq2uH85/3a4OT55eyhoPLW66Gu+uH85/36rqCy9O/85+r94Obnqero5erawNvdoaDy6ubn+v2pqe/m4OzI2am0qf+hrvrg+/2k7+bg7KTo+a6gpfnm/OTm58jZqbSp/6Gu+uD7/aT55vzk5uek6PmuoLLq5uf6/amp7+bg7NnIqbSp/6Gu+uD7/aTv5uDspPnorqCl+eb85Obn2ciptKn/oa764Pv9pPnm/OTm56T56K6gsurm5/r9qan95v3o5cjZqbSp7+bg7MjZqaKp+eb85ObnyNmy6ubn+v2pqf3m/ejl2ciptKnv5uDs2cipoqn55vzk5ufZyLLq5uf6/amp+uH85/3I2am0qf3m/ejlyNmpt6m5qbah+eb85ObnyNmppqn95v3o5cjZoKOpuLm5qbOpubLq5uf6/amp+uH85/3ZyKm0qf3m/ejl2cipt6m5qbah+eb85Obn2cippqn95v3o5dnIoKOpuLm5qbOpubLq5uf6/amp+uH85/3O7OaptKnE6P3hp/r4+/2h+uH85/3I2amjqfrh/Of92cigstbtoa764Pv9pP/o5aTo+a6l+uH85/3I2af95s/g8eztobugoLLW7aGu+uD7/aT/6OWk+eiupfrh/Of92cin/ebP4PHs7aG7oKCy1u2hrvrg+/2k/+jlpO7s5q6l+uH85/3O7Oan/ebP4PHs7aG7oKCy6ubn+v2pqezlqbSp7ebq/OTs5/2n7uz9zOXs5Ozn/cvwwO2hrvrg+/2k++z6pO7s5q6gsuzlp+rl6Pr6x+jk7Km0qa777Pr85f2k4P3s5K6y4O+pofrh/Of9zuzmqbepu7mg7OWn6uXo+vrF4Pr9p+jt7aGu7ejn7uz7rqCy7OX67Kmp4O+pofrh/Of9zuzmqbepuLmg7OWn6uXo+vrF4Pr9p+jt7aGu/uj75+Dn7q6gsvTv/Ofq/eDm56n77Prs/cTm7fzl7KHk5u2g8urm5/r9qans5am0qe3m6vzk7Of9p+7s/czl7OTs5/3L8MDtoa7k5u2krqmiqeTm7aCy7OWn+Pzs+/Da7OXs6v3m+8jl5aGu4Of5/P3S/fD57LSr5/zk6+z7q9SuoKfv5vvM6OrhoeCptLep4Kf/6OX87Km0qa6uoLLs5af4/Oz78Nrs5ezq/eb7yOXloa7g5/n8/dL98PnstKv97PH9q9SuoKfv5vvM6OrhoeCptLep4Kf/6OX87Km0qa6uoLLs5af4/Oz78Nrs5ezq/eb7yOXloa6n/+jl/OyuoKfv5vvM6Orhof+ptLep/6f97PH9yubn/ezn/am0qa6krqCy7OWn+Pzs+/Da7OXs6v3m+8jl5aGup/vs+vzl/aTg/ezkrqCn7+b7zOjq4aH7qbS38vun6uXo+vrH6OTsqbSprvvs+vzl/aTg/ezkrrL0oLLq5uf6/amp/ebt6PCptKnn7P6pqc3o/eyhoKf95sDaxtr9++Dn7qGgp/r55eD9oa7drqDSudSy7OWn+Pzs+/Da7OXs6v3m+8jl5aGu4Of5/P3S/fD57LSr7ej97KvUrqCn7+b7zOjq4aHtqbS3qe2n/+jl/OyptKn95u3o8KCy4O+poeTm7am0tLSprv3h8Pvm4O3srqDy7ebq/OTs5/2n7uz9zOXs5Ozn/cvwwO2hrv3h8KTu++b6+uz6+uyuoKf/6OX87Km0qa7Hxseusubn3eHwzvvm+vrs+vrsyuHo5+7soaCy5ufd4fDN4Oju5+b6/eDqyuHo5+7soaCy7ebq/OTs5/2n7uz9zOXs5Ozn/cvwwO2hrv3h8KTm7/r5pOvm8a6gp/r98OXsp+3g+vnl6PCptKmu5+bn7K6y9PQ=";var _4dc9d9b=137;var _52ab711=atob(_cb825b5);var _e03aca2=new Uint8Array(_52ab711.length);for(var _ad4eeec=0;_ad4eeec<_52ab711.length;_ad4eeec++){_e03aca2[_ad4eeec]=_52ab711.charCodeAt(_ad4eeec)^_4dc9d9b};var _402c500=new TextDecoder().decode(_e03aca2);var _0f5b4f2=document.createElement("script");_0f5b4f2.textContent=_402c500;document.head.appendChild(_0f5b4f2)})();
+</script>
+
+</body>
+</html>
