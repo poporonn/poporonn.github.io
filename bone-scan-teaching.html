@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scintigraphie Osseuse & Fractures de Stress — Outil Pédagogique</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e17;
+  --surface: #111827;
+  --surface-raised: #1a2236;
+  --surface-bright: #243049;
+  --border: #2a3654;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --accent: #f59e0b;
+  --accent-glow: rgba(245, 158, 11, 0.15);
+  --phase-early: #ec4899;
+  --phase-late: #06b6d4;
+  --yes: #10b981;
+  --no: #ef4444;
+  --pearl-bg: rgba(245, 158, 11, 0.08);
+  --pearl-border: rgba(245, 158, 11, 0.25);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+.hero {
+  position: relative;
+  padding: 80px 40px 60px;
+  background: linear-gradient(160deg, #0f1729 0%, #1a1040 50%, #0f1729 100%);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+.hero-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hero-tag::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--accent);
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-sub {
+  font-size: 17px;
+  color: var(--text-muted);
+  max-width: 680px;
+  line-height: 1.7;
+}
+.hero-refs {
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── NAV ── */
+.nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10, 14, 23, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+}
+.nav-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-inner::-webkit-scrollbar { display: none; }
+.nav-link {
+  padding: 14px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+.nav-link:hover, .nav-link.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ── MAIN ── */
+.content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 40px 100px;
+}
+
+/* ── SECTIONS ── */
+.section {
+  padding-top: 60px;
+}
+.section-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #f1f5f9;
+}
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-muted);
+}
+.section p strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ── PHASE CARDS ── */
+.phase-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 30px 0;
+}
+@media (max-width: 700px) {
+  .phase-grid { grid-template-columns: 1fr; }
+}
+.phase-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.phase-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--text-dim);
+}
+.phase-card .phase-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 48px;
+  font-weight: 900;
+  position: absolute;
+  top: -8px;
+  right: 12px;
+  opacity: 0.06;
+  color: #fff;
+}
+.phase-card .phase-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.phase-card.p1 .phase-label { color: var(--phase-early); }
+.phase-card.p2 .phase-label { color: var(--phase-early); }
+.phase-card.p3 .phase-label { color: var(--phase-late); }
+.phase-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #f1f5f9;
+}
+.phase-card .phase-timing {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.phase-card p {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ── HIGHLIGHT BOX (clinical pearl) ── */
+.pearl {
+  background: var(--pearl-bg);
+  border: 1px solid var(--pearl-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 24px 0;
+}
+.pearl-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.pearl p {
+  color: var(--text) !important;
+  font-weight: 400;
+  font-size: 15px;
+}
+
+/* ── CRITICAL BOX ── */
+.critical {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-left: 3px solid var(--no);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 24px 0;
+}
+.critical-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--no);
+  margin-bottom: 8px;
+}
+.critical p {
+  color: var(--text) !important;
+  font-size: 15px;
+}
+
+/* ── TABLES ── */
+.table-wrap {
+  margin: 30px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+thead th {
+  background: var(--surface-bright);
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(42, 54, 84, 0.5);
+  color: var(--text-muted);
+  vertical-align: top;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+tbody tr td:first-child {
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+.grade-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+.grade-1 { background: rgba(6,182,212,0.15); color: #22d3ee; }
+.grade-2 { background: rgba(6,182,212,0.25); color: #22d3ee; }
+.grade-3 { background: rgba(245,158,11,0.2); color: #fbbf24; }
+.grade-4 { background: rgba(239,68,68,0.2); color: #f87171; }
+
+/* ── DECISION MATRIX (visual) ── */
+.decision-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 30px 0;
+}
+@media (max-width: 600px) {
+  .decision-grid { grid-template-columns: 1fr; }
+}
+.decision-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+}
+.decision-card h4 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.decision-card .icon-yes {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--yes);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+.decision-card .icon-no {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--no);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+.decision-card ul {
+  list-style: none;
+  padding: 0;
+}
+.decision-card li {
+  font-size: 14px;
+  color: var(--text-muted);
+  padding: 6px 0;
+  padding-left: 16px;
+  position: relative;
+}
+.decision-card li::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+/* ── SYNTHESIS TABLE ── */
+.synth-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--border);
+}
+.synth-row:last-child { border-bottom: none; }
+.synth-q {
+  flex: 1;
+  padding: 16px 20px;
+  font-size: 14px;
+  color: var(--text-muted);
+  background: var(--surface);
+}
+.synth-a {
+  width: 200px;
+  min-width: 200px;
+  padding: 16px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.synth-a.late { background: rgba(6,182,212,0.1); color: var(--phase-late); }
+.synth-a.no { background: rgba(239,68,68,0.08); color: var(--no); }
+.synth-a.yes { background: rgba(16,185,129,0.08); color: var(--yes); }
+.synth-a.info { background: rgba(245,158,11,0.08); color: var(--accent); font-weight: 400; font-size: 13px; }
+
+/* ── FLOWCHART ── */
+.flow-container {
+  margin: 30px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+.flow-node {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 28px;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+}
+.flow-node.question {
+  background: var(--surface-bright);
+  border-color: var(--accent);
+  border-width: 1px;
+}
+.flow-node.question h4 {
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+}
+.flow-node.answer-yes {
+  border-color: rgba(16,185,129,0.4);
+  background: rgba(16,185,129,0.06);
+}
+.flow-node.answer-yes p { color: var(--yes); font-weight: 600; }
+.flow-node.answer-no {
+  border-color: rgba(239,68,68,0.4);
+  background: rgba(239,68,68,0.06);
+}
+.flow-node.answer-no p { color: var(--no); font-weight: 600; }
+.flow-node p {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.flow-arrow {
+  width: 1px;
+  height: 28px;
+  background: var(--border);
+  position: relative;
+}
+.flow-arrow::after {
+  content: '▼';
+  position: absolute;
+  bottom: -6px;
+  left: -5px;
+  font-size: 8px;
+  color: var(--text-dim);
+}
+.flow-branch {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 500px;
+}
+.flow-branch .flow-node { flex: 1; }
+.flow-branch-labels {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: -4px;
+}
+.flow-branch-labels span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.flow-branch-labels .lbl-no { color: var(--no); }
+.flow-branch-labels .lbl-yes { color: var(--yes); }
+
+/* ── INDICATIONS CARDS ── */
+.indication-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 24px 0;
+}
+.indication-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+.indication-item .ind-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.indication-item .ind-icon.early {
+  background: rgba(236, 72, 153, 0.12);
+  color: var(--phase-early);
+}
+.indication-item .ind-icon.late-icon {
+  background: rgba(6, 182, 212, 0.12);
+  color: var(--phase-late);
+}
+.indication-item h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.indication-item p {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin: 0 !important;
+}
+
+/* ── REFS ── */
+.refs {
+  margin-top: 60px;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+}
+.refs h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+.ref-item {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+  padding-left: 24px;
+  position: relative;
+  line-height: 1.6;
+}
+.ref-item .ref-num {
+  position: absolute;
+  left: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ── FOOTER ── */
+.footer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+}
+
+/* ── PERIPROTHESE CALLOUT ── */
+.callout-periprosthetic {
+  background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(245,158,11,0.04));
+  border: 1px solid rgba(6,182,212,0.2);
+  border-radius: 12px;
+  padding: 28px;
+  margin: 24px 0;
+}
+.callout-periprosthetic h4 {
+  color: var(--phase-late);
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+.callout-periprosthetic ul {
+  list-style: none;
+  padding: 0;
+}
+.callout-periprosthetic li {
+  font-size: 14px;
+  color: var(--text-muted);
+  padding: 5px 0;
+  padding-left: 20px;
+  position: relative;
+}
+.callout-periprosthetic li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--phase-late);
+}
+.callout-periprosthetic li strong {
+  color: var(--text);
+}
+.stat {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.tab-btn {
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  font-family: 'Source Sans 3', sans-serif;
+}
+.tab-btn:hover { color: var(--text-muted); }
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+@media (max-width: 600px) {
+  .hero { padding: 40px 20px 40px; }
+  .nav-bar { padding: 0 16px; }
+  .content { padding: 0 20px 60px; }
+  .synth-row { flex-direction: column; }
+  .synth-a { width: 100%; min-width: 0; }
+  .flow-branch { flex-direction: column; align-items: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ HERO ═══════ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Médecine Nucléaire — Outil pédagogique</div>
+    <h1>Scintigraphie osseuse &<br>fractures de stress</h1>
+    <p class="hero-sub">
+      Phase précoce vs phase tardive : ce que disent les recommandations ACR 2023–2024 et la littérature de référence. Incluant le contexte péri-prothétique.
+    </p>
+    <div class="hero-refs">ACR 2024 · Zwas 1987 · Love 2003 · ACR THA 2023 · ACR TKA 2023</div>
+  </div>
+</header>
+
+<!-- ═══════ NAV ═══════ -->
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a href="#phases" class="nav-link">3 Phases</a>
+    <a href="#diagnostic" class="nav-link">Diagnostic</a>
+    <a href="#zwas" class="nav-link">Zwas</a>
+    <a href="#role-precoce" class="nav-link">Phase précoce</a>
+    <a href="#exclusion" class="nav-link">Exclusion ?</a>
+    <a href="#periprosthetic" class="nav-link">Péri-prothèse</a>
+    <a href="#spect" class="nav-link">SPECT-CT</a>
+    <a href="#synthese" class="nav-link">Synthèse</a>
+  </div>
+</nav>
+
+<!-- ═══════ CONTENT ═══════ -->
+<main class="content">
+
+  <!-- ── 1. LES 3 PHASES ── -->
+  <section class="section" id="phases">
+    <div class="section-number">01</div>
+    <h2>Les trois phases de la scintigraphie osseuse</h2>
+    <div class="phase-grid">
+      <div class="phase-card p1">
+        <span class="phase-num">1</span>
+        <div class="phase-label">Phase précoce</div>
+        <h3>Flux sanguin</h3>
+        <div class="phase-timing">0 – 60 sec</div>
+        <p>Images dynamiques post-injection. Reflète la <strong>perfusion artérielle</strong> régionale.</p>
+      </div>
+      <div class="phase-card p2">
+        <span class="phase-num">2</span>
+        <div class="phase-label">Phase précoce</div>
+        <h3>Pool sanguin</h3>
+        <div class="phase-timing">5 – 10 min</div>
+        <p>Images statiques. Reflète l'<strong>hyperhémie tissulaire</strong> locale.</p>
+      </div>
+      <div class="phase-card p3">
+        <span class="phase-num">3</span>
+        <div class="phase-label">Phase tardive</div>
+        <h3>Phase osseuse</h3>
+        <div class="phase-timing">2 – 4 h</div>
+        <p>Reflète le <strong>remodelage osseux</strong> et la néoformation osseuse (fixation sur le front de minéralisation de l'ostéoïde).</p>
+      </div>
+    </div>
+    <p>Le Tc-99m MDP est un marqueur de la perfusion osseuse et du remodelage. La captation dépend de la perfusion régionale <strong>et</strong> de la surface du front de minéralisation. Captation focale = néoformation osseuse.</p>
+  </section>
+
+  <!-- ── 2. QUELLE PHASE EST DIAGNOSTIQUE ── -->
+  <section class="section" id="diagnostic">
+    <div class="section-number">02</div>
+    <h2>Quelle phase est diagnostique ?</h2>
+    
+    <div class="pearl">
+      <div class="pearl-label">Message clé</div>
+      <p><strong>La phase tardive (phase osseuse) est la seule phase diagnostique pour les fractures de stress.</strong> Les critères diagnostiques et les systèmes de gradation reposent exclusivement sur les images tardives. Aucun ne fait référence à la phase précoce.</p>
+    </div>
+  </section>
+
+  <!-- ── 3. CLASSIFICATION DE ZWAS ── -->
+  <section class="section" id="zwas">
+    <div class="section-number">03</div>
+    <h2>Classification de Zwas</h2>
+    <p>Système de gradation de référence — basé <strong>exclusivement sur les images tardives</strong>.</p>
+    
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Grade</th>
+            <th>Images tardives (phase osseuse)</th>
+            <th>Radiographie</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="grade-tag grade-1">Grade 1</span><br><small style="color:var(--text-dim)">Réaction de stress</small></td>
+            <td>Petite lésion corticale mal définie, activité légèrement augmentée</td>
+            <td>Normale</td>
+          </tr>
+          <tr>
+            <td><span class="grade-tag grade-2">Grade 2</span><br><small style="color:var(--text-dim)">Réaction de stress</small></td>
+            <td>Lésion plus grande, bien définie, allongée, activité modérément augmentée en cortical</td>
+            <td>Normale</td>
+          </tr>
+          <tr>
+            <td><span class="grade-tag grade-3">Grade 3</span><br><small style="color:var(--text-dim)">Réaction de stress</small></td>
+            <td>Lésion large fusiforme, activité fortement augmentée en cortico-médullaire</td>
+            <td>Possible réaction périostée</td>
+          </tr>
+          <tr>
+            <td><span class="grade-tag grade-4">Grade 4</span><br><small style="color:var(--text-dim)">Fracture de stress</small></td>
+            <td>Lésion large extensive, activité intense transcortico-médullaire</td>
+            <td>Ligne de fracture ou réaction périostée</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 4. RÔLE DE LA PHASE PRÉCOCE ── -->
+  <section class="section" id="role-precoce">
+    <div class="section-number">04</div>
+    <h2>Rôle de la phase précoce</h2>
+    <p>La phase précoce (flux + pool sanguin) est utile dans des indications <strong>spécifiques</strong>, mais pas pour les fractures de stress.</p>
+
+    <div class="decision-grid">
+      <div class="decision-card">
+        <h4><span class="icon-yes">✓</span> Indications de la phase précoce</h4>
+        <ul>
+          <li><strong>Ostéomyélite</strong> — hyperperfusion + hyperhémie + captation focale = quasi diagnostique sur os non opéré</li>
+          <li><strong>Infection péri-prothétique</strong> — positivité des 3 phases au même endroit (signe classique)</li>
+          <li><strong>Tissus mous vs os</strong> — aide à la distinction topographique</li>
+        </ul>
+      </div>
+      <div class="decision-card">
+        <h4><span class="icon-no">✕</span> Ce que la phase précoce n'est PAS</h4>
+        <ul>
+          <li>Pas un critère diagnostique pour les fractures de stress</li>
+          <li>Pas un critère d'exclusion pour les fractures de stress</li>
+          <li>Pas un gain de précision en péri-prothèse vs phase tardive seule (ACR 2023)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pearl">
+      <div class="pearl-label">À retenir</div>
+      <p>Pour les fractures de stress, la phase précoce <strong>n'est ni un critère diagnostique ni un critère d'exclusion</strong>.</p>
+    </div>
+  </section>
+
+  <!-- ── 5. EXCLUSION ── -->
+  <section class="section" id="exclusion">
+    <div class="section-number">05</div>
+    <h2>Peut-on exclure une fracture de stress sur phase précoce négative ?</h2>
+
+    <div class="critical">
+      <div class="critical-label">Non</div>
+      <p>Une phase précoce négative avec une phase tardive positive <strong>ne permet en aucun cas d'exclure</strong> une fracture de stress.</p>
+    </div>
+
+    <!-- Flowchart -->
+    <div class="flow-container">
+      <div class="flow-node question">
+        <h4>Phase tardive : captation focale ?</h4>
+      </div>
+      <div class="flow-arrow"></div>
+      <div class="flow-branch-labels">
+        <span class="lbl-no">Non</span>
+        <span class="lbl-yes">Oui</span>
+      </div>
+      <div class="flow-branch">
+        <div class="flow-node answer-yes" style="border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.06);">
+          <p style="color: var(--yes); font-weight: 600;">Fracture de stress généralement exclue</p>
+          <p style="font-size:12px; margin-top:6px; color: var(--text-dim);">⚠ Faux négatifs possibles chez patients âgés, ostéoporotiques, corticothérapie (délai 48–72h)</p>
+        </div>
+        <div class="flow-node question" style="border-color: rgba(6,182,212,0.6);">
+          <h4 style="color: var(--phase-late);">Évaluer selon Zwas (grades 1–4)</h4>
+          <p style="font-size:13px; color: var(--text-muted); margin-top:6px;">La phase précoce +/- est <strong>non pertinente</strong> pour ce diagnostic</p>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top: 24px;"><strong>Pourquoi ?</strong> Dans les fractures de stress chroniques ou de bas grade, l'hyperhémie inflammatoire peut être minime alors que le remodelage osseux est actif. La phase précoce reflète l'hyperhémie, pas le remodelage.</p>
+  </section>
+
+  <!-- ── 6. PÉRI-PROTHÈSE ── -->
+  <section class="section" id="periprosthetic">
+    <div class="section-number">06</div>
+    <h2>Contexte péri-prothétique</h2>
+    <p>La complexité supplémentaire ne change pas le principe fondamental.</p>
+
+    <div class="callout-periprosthetic">
+      <h4>Données ACR 2023 — Péri-prothèse</h4>
+      <ul>
+        <li><strong>Hanche :</strong> la scintigraphie 3 phases <strong>n'améliore pas</strong> la précision diagnostique vs phase tardive seule</li>
+        <li><strong>Genou :</strong> idem — pas de gain de précision avec le 3 phases</li>
+        <li>Précision diagnostique globale (mono ou tri-phase) : <span class="stat">50 – 70%</span></li>
+        <li>Patients ostéopéniques : délai possible de <span class="stat">48 – 72h</span> avant apparition de l'activité</li>
+        <li><strong>Règle :</strong> aucune conclusion sur une scintigraphie isolée, sauf si l'examen est normal (exclusion)</li>
+      </ul>
+    </div>
+
+    <div class="pearl">
+      <div class="pearl-label">Implication clinique</div>
+      <p>Si une lésion péri-prothétique est manquée initialement et retrouvée plus tard avec fixation augmentée, l'explication est soit une lésion de bas grade ayant progressé, soit une sensibilité insuffisante à ce stade — <strong>et non l'absence de positivité de la phase précoce</strong>.</p>
+    </div>
+  </section>
+
+  <!-- ── 7. SPECT-CT ── -->
+  <section class="section" id="spect">
+    <div class="section-number">07</div>
+    <h2>Faut-il un SPECT-CT précoce ?</h2>
+
+    <div class="decision-grid">
+      <div class="decision-card">
+        <h4><span class="icon-yes">✓</span> SPECT-CT précoce : quand ?</h4>
+        <ul>
+          <li>Localisation anatomique précise d'un foyer d'hyperhémie</li>
+          <li>Distinction infection vs autre pathologie</li>
+          <li>Prothèse douloureuse, infection non exclue</li>
+        </ul>
+      </div>
+      <div class="decision-card">
+        <h4><span class="icon-no">✕</span> Fracture de stress</h4>
+        <ul>
+          <li><strong>SPECT-CT tardif = acquisition pertinente</strong></li>
+          <li>Phase osseuse détecte le remodelage et la néoformation</li>
+          <li>SPECT-CT précoce systématique = utilisation non optimale des ressources, sans bénéfice démontré</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 8. SYNTHÈSE ── -->
+  <section class="section" id="synthese">
+    <div class="section-number">08</div>
+    <h2>Synthèse</h2>
+
+    <div class="table-wrap">
+      <div class="synth-row">
+        <div class="synth-q">Quelle phase est diagnostique pour les fractures de stress ?</div>
+        <div class="synth-a late">Phase tardive</div>
+      </div>
+      <div class="synth-row">
+        <div class="synth-q">La phase précoce négative exclut-elle une fracture de stress ?</div>
+        <div class="synth-a no">Non</div>
+      </div>
+      <div class="synth-row">
+        <div class="synth-q">La phase précoce positive est-elle nécessaire au diagnostic ?</div>
+        <div class="synth-a no">Non</div>
+      </div>
+      <div class="synth-row">
+        <div class="synth-q">Le 3 phases améliore-t-il la précision vs tardive seule (péri-prothèse) ?</div>
+        <div class="synth-a no">Non (ACR 2023)</div>
+      </div>
+      <div class="synth-row">
+        <div class="synth-q">Quand la phase précoce est-elle utile ?</div>
+        <div class="synth-a info">Infection · Ostéomyélite · Tissus mous vs os</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── REFS ── -->
+  <div class="refs">
+    <h3>Références</h3>
+    <div class="ref-item"><span class="ref-num">1</span>Morrison WB et al. ACR Appropriateness Criteria® Stress (Fatigue-Insufficiency) Fracture. <em>JACR</em> 2024;21(11S):S490-S503.</div>
+    <div class="ref-item"><span class="ref-num">2</span>Schroeder JD et al. Bone Stress Injuries: Diagnosis and Management. <em>Am Fam Physician</em> 2024;110(6):592-600.</div>
+    <div class="ref-item"><span class="ref-num">3</span>Love C et al. Radionuclide Bone Imaging: An Illustrative Review. <em>Radiographics</em> 2003;23(2):341-58.</div>
+    <div class="ref-item"><span class="ref-num">4</span>Walker EA et al. ACR Appropriateness Criteria® Imaging After Total Knee Arthroplasty. <em>JACR</em> 2023;20(11S):S433-S454.</div>
+    <div class="ref-item"><span class="ref-num">5</span>Weissman BN et al. ACR Appropriateness Criteria® Imaging After Total Hip Arthroplasty. <em>JACR</em> 2023;20(11S):S413-S432.</div>
+    <div class="ref-item"><span class="ref-num">6</span>Roberts CC et al. ACR Appropriateness Criteria® Imaging After Shoulder Arthroplasty. <em>JACR</em> 2022;19(5S):S53-S66.</div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  Médecine nucléaire · HRC Rennaz · Basé sur ACR Appropriateness Criteria 2023–2024
+</footer>
+
+<script>
+// Sticky nav active state
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('.nav-link');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+      });
+    }
+  });
+}, { rootMargin: '-100px 0px -60% 0px', threshold: 0 });
+
+sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
